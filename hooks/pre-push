@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tpl_timestamp=$(date -r README.tpl.md +%s)
+readme_timestamp=$(date -r README.md +%s)
+
+if ((tpl_timestamp > readme_timestamp)); then
+  echo 'ERROR: README.md is out of date, run `make readme` to update it before pushing your changes.' >&2
+  exit 1
+fi
+
