@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/homelabtools/template-go-cli/meta"
+	"github.com/homelabtools/homecert/meta"
 )
 
 func main() {

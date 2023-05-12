@@ -1,4 +1,4 @@
-PROJECT_NAME         := template-go-cli
+PROJECT_NAME         := homecert
 
 BIN_NAME             := $(PROJECT_NAME)
 MODULE               := $(shell awk 'NR==1{print $$2}' go.mod)

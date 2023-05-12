@@ -1,3 +1,3 @@
-module github.com/homelabtools/template-go-cli
+module github.com/homelabtools/homecert
 
 go 1.20

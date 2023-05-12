@@ -1,2 +1,2 @@
-# template-go-cli
-Template for new Go CLI projects.
+# homecert
+Easy management of a home root CA and SSL/TLS certificates.
