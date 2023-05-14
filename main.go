@@ -1,12 +1,12 @@
 package main
 
 import (
-	"bytes"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"math/big"
@@ -19,31 +19,81 @@ import (
 func main() {
 	err := mainE()
 	if err != nil {
-		panic(err)
+		fmt.Printf("ERROR: %s\n", err)
+		os.Exit(1)
 	}
 }
 
 func mainE() error {
-	subject := pkix.Name{CommonName: "My CA"}
-	expiration := time.Hour * 24 * 365 * 10 // 10 years
-	pemFilename := "ca_certificate.pem"
-	cerFilename := "ca_certificate.cer"
+	var (
+		commonName         string
+		organizationalUnit string
+		organization       string
+		locality           string
+		state              string
+		country            string
+		durationYears      int
+	)
+
+	flag.StringVar(&commonName, "cn", "", "Common Name")
+	flag.StringVar(&organizationalUnit, "ou", "", "Organizational Unit")
+	flag.StringVar(&organization, "o", "", "Organization")
+	flag.StringVar(&locality, "l", "", "Locality")
+	flag.StringVar(&state, "s", "", "State or Province")
+	flag.StringVar(&country, "c", "", "Country Name")
+	flag.IntVar(&durationYears, "duration", 10, "Duration in years")
+
+	flag.Parse()
+
+	if flag.NFlag() == 0 {
+		flag.Usage()
+		os.Exit(1)
+	}
+
+	if commonName == "" {
+		return fmt.Errorf("must provide a common name")
+	}
+
+	name := pkix.Name{
+		CommonName: commonName,
+	}
+
+	if organizationalUnit != "" {
+		name.OrganizationalUnit = []string{organizationalUnit}
+	}
+
+	if organization != "" {
+		name.Organization = []string{organization}
+	}
+
+	if locality != "" {
+		name.Locality = []string{locality}
+	}
+
+	if state != "" {
+		name.Province = []string{state}
+	}
+
+	if country != "" {
+		name.Country = []string{country}
+	}
 
 	password, err := readPasswordFromTerminal("Enter password: ")
 	if err != nil {
 		return fmt.Errorf("error reading password: %w", err)
 	}
-
 	confirmPassword, err := readPasswordFromTerminal("Confirm password: ")
 	if err != nil {
 		return fmt.Errorf("error reading password: %w", err)
 	}
-
-	if !bytes.Equal(password, confirmPassword) {
-		return fmt.Errorf("passwords do not match")
+	if string(password) != string(confirmPassword) {
+		return fmt.Errorf("passwords did not match")
 	}
 
-	err = createRootCA(subject, expiration, pemFilename, cerFilename, password)
+	cerPath := commonName + ".cer"
+	pemPath := commonName + ".pem"
+
+	err = createRootCA(name, time.Duration(durationYears)*365*24*time.Hour, pemPath, cerPath, password)
 	if err != nil {
 		return fmt.Errorf("error creating root CA: %w", err)
 	}
