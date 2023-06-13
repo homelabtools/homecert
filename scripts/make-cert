@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ca_name="$1"
+cert_name="$2"
+cn="${3:-2}"
+
+ca_cert="$ca_name.cert"
+ca_key="$ca_name.key"
+srl="$ca_name.srl"
+
+key="$cert_name.key"
+cert="$cert_name.cert"
+csr="$cert_name.csr"
+config="common.cnf"
+
+openssl req -newkey rsa:2048 -nodes -keyout "$key" -out "$csr" -subj "/CN=${cn}" -config "$config"
+
+read -s -p "Password for CA: " password
+echo "$password" | openssl x509 -req -in "$csr" -CA "$ca_cert" -CAkey "$ca_key" -CAcreateserial -out "$cert" -extfile "$config" -days 3650 -passin stdin
+

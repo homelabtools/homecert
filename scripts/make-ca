@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+name="$1"
+
+ca="$name.cert"
+ca_key="$name.key"
+
+
+openssl genpkey -algorithm EC -aes256 -out "$ca_key" -pkeyopt ec_paramgen_curve:P-256
+openssl req -new -x509 -key "$ca_key" -out "$ca" -days 3650
+

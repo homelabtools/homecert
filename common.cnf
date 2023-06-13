@@ -1,0 +1,12 @@
+[ req ]
+distinguished_name = req_distinguished_name
+prompt = yes
+
+[ req_distinguished_name ]
+C = US
+ST = Washington
+L = Seattle
+O = 11055
+OU = Network
+CN = <subdomain.11055.house>
+
